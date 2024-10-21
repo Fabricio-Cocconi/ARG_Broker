@@ -69,3 +69,5 @@ class Porfolio:
             "vendidas": self.acciones_vendidas,
             "ganancias": self.ganancias
         }
+
+#prueba
