@@ -14,11 +14,6 @@ class Usuario:
         self.saldo += cantidad
         return self.saldo
 
-    def actualizar_rendimiento_total(self, portafolio):
-        ganancias_totales = portafolio.ganancias
-        if self.total_invertido > 0:
-            self.rendimiento_total = (ganancias_totales / self.total_invertido) * 100
-
 class Accion_de_empresa:
     def __init__(self, nombre_accion_empresa, minimo_compra, cotizacion, maximo_compra):
         self.nombre_accion_empresa = nombre_accion_empresa
