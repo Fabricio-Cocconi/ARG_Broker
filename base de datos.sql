@@ -109,5 +109,5 @@ WHERE u.idUsuario = 1;
 -- Mostrar las cotizaciones históricas de una acción
 SELECT fechaHora, precio FROM Cotizacion WHERE idAccion = 1 ORDER BY fechaHora DESC;
 
--- Mostrar todas las acciones disponibless
+-- Mostrar todas las acciones disponibles
 SELECT nombre, simbolo, precio_actual FROM Accion;
