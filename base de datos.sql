@@ -8,11 +8,14 @@ USE ARGBroker;
 -- Tabla Usuario
 CREATE TABLE Usuario (
     idUsuario INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(50),
-    apellido VARCHAR(50),
-    email VARCHAR(100) UNIQUE,
-    contraseña VARCHAR(100),
-    saldo DECIMAL(10, 2) DEFAULT 0
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    cuil INT(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    saldo DECIMAL(10, 2) DEFAULT 0,
+    intentos_fallidos INT DEFAULT 0,
+    hora_bloqueado DATETIME DEFAULT NULL
 );
 
 -- Tabla Accion
@@ -60,9 +63,9 @@ CREATE TABLE Portafolio (
 -- 4. Insertar datos iniciales
 
 -- Insertar usuarios
-INSERT INTO Usuario (nombre, apellido, email, contraseña, saldo) 
-VALUES ('Alvaro', 'Benicio', 'alvarobeniicio@gmail.com', 'd123', 50000.00),
-       ('Maria', 'Lopez', 'maria.lopez@gmail.com', 'd1234', 75000.00);
+INSERT INTO Usuario (nombre, apellido, cuil, email, password, saldo) 
+VALUES ('Alvaro', 'Benicio', 1, 'alvarobeniicio@gmail.com', 'd123', 50000.00),
+       ('Maria', 'Lopez', 2, 'maria.lopez@gmail.com', 'd1234', 75000.00);
 
 -- Insertar acciones
 INSERT INTO Accion (nombre, simbolo, precio_apertura, precio_actual) 

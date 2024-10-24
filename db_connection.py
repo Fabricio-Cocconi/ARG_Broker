@@ -23,26 +23,30 @@ class ConectarDB:
             self.connection.close()
             print("Conexión cerrada")
 
-    def ejecutar_consulta(self, query, values=None):
+    def ejecutar_consulta(self, consulta, valores=None):
         cursor = self.connection.cursor()
         try:
-            if values:
-                cursor.execute(query, values)
+            if valores:
+                # Al realizar la consulta de este modo, estoy evitando inyecciones SQL
+                cursor.execute(consulta, valores)
             else:
-                cursor.execute(query)
+                cursor.execute(consulta)
             self.connection.commit()
             print("Consulta ejecutada exitosamente")
         except Error as e:
             print(f"Error al ejecutar la consulta: {e}")
         finally:
             cursor.close()
-
-    def obtener_datos(self, query):
+            
+    def obtener_datos(self, consulta, valores=None):
         cursor = self.connection.cursor()
         try:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            return result
+            if valores:
+                cursor.execute(consulta, valores)  # Se agrego la variable de valores para evitar inyecciones SQL
+            else:
+                cursor.execute(consulta)
+            resultado = cursor.fetchall()
+            return resultado
         except Error as e:
             print(f"Error al obtener los datos: {e}")
         finally:
