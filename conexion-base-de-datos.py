@@ -42,7 +42,7 @@ def mostrar_transacciones_usuario(conexion, id_usuario):
     WHERE idUsuario = %s
     """
     cursor.execute(query, (id_usuario,))
-    transacciones = cursor.fetchall()
+    trancciones = cursor.fetchall()
     print(f"\n--- Transacciones del Usuario {id_usuario} ---")
     for transaccion in transacciones:
         print(f"Tipo: {transaccion[0]}, Cantidad: {transaccion[1]}, Precio: {transaccion[2]}, Fecha: {transaccion[3]}")
