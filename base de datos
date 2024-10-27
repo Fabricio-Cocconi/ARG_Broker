@@ -32,7 +32,7 @@ CREATE TABLE Transaccion (
     cantidad INT,
     precio DECIMAL(10, 2),
     tipoTransaccion ENUM('compra', 'venta'),
-    comision DECIMAL(10, 2),
+    comision DECIMAL(5, 2),
     fechaOperacion DATETIME,
     FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario),
     FOREIGN KEY (idAccion) REFERENCES Accion(idAccion)
@@ -107,4 +107,4 @@ WHERE u.idUsuario = 1;
 SELECT fechaHora, precio FROM Cotizacion WHERE idAccion = 1 ORDER BY fechaHora DESC;
 
 -- Mostrar todas las acciones disponibless
-SELECT nombre, simbolo, precio_actual FROM Accion;
+SELECT nombre AS nombre_accion, simbolo, precio_actual AS precio FROM Accion;
