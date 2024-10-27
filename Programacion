@@ -18,6 +18,7 @@ class Usuario:
         ganancias_totales = portafolio.ganancias
         if self.total_invertido > 0:
             self.rendimiento_total = (ganancias_totales / self.total_invertido) * 100
+        return self.rendimiento_total
 
 class Accion_de_empresa:
     def __init__(self, nombre_accion_empresa, minimo_compra, cotizacion, maximo_compra):
@@ -49,10 +50,11 @@ class Transaccion:
     if accion.nombre_accion_empresa in portafolio_acciones_compradas and portafolio.acciones_compradas[accion.nombre_accion_empresa] >= cantidad:
         total_venta = (accion.cotizacion * cantidad) - self.comision_broker
         usuario.saldo += total_venta
+        portafolio.agregar_accion_vendida(accion,cantidad)
+        portafolio.ganancias += total_venta
         return total_venta
     else:
         raise ValueError("Cantidad de acciones insuficientes")
-
 
 class Porfolio:
     def __init__(self):
@@ -83,6 +85,7 @@ class Porfolio:
  # menu.py
 
 from broker import Usuario, Accion_de_empresa, Transaccion, Porfolio
+transacción.venta(accion, cantidad, usuario, portafolio)
 
 def mostrar_menu():
     print("\nBienvenido al ARG Broker, ¿qué desea hacer?")
