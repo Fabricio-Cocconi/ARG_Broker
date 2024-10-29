@@ -13,15 +13,15 @@ class ConectarDB:
                 password="",
                 database="argbroker"
             )
-            if self.connection.is_connected():
-                print("Conexión exitosa a la base de datos")
+            # if self.connection.is_connected():
+                # print("Conexión exitosa a la base de datos")
         except Error as e:
             print(f"Error al conectar a la base de datos: {e}")
 
     def desconectar(self):
         if self.connection.is_connected():
             self.connection.close()
-            print("Conexión cerrada")
+            # print("Conexión cerrada")
 
     def ejecutar_consulta(self, consulta, valores=None):
         cursor = self.connection.cursor()
