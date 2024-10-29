@@ -101,6 +101,8 @@ class OperacionesUsuarioDB:
             self.db.ejecutar_consulta("UPDATE Usuario SET codigo_verificacion = %s WHERE idUsuario = %s", 
                                       (codigo, usuario[0]))
             print(f"Se ha generado un código de verificación para el usuario {usuario[1]} {usuario[2]}.")
+            print(f"Este código en realidad se enviaría por correo electronico, notificación push, etc.")
+            print(f"Solo se muestra en consola por temas de simulación.")
             print(f"Código de verificación (simulado): {codigo}")
         else:
             print("Usuario no encontrado.")

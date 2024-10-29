@@ -1,94 +1,113 @@
- # menu.py
+from operaciones_usuario import OperacionesUsuarioDB
+from db_connection import ConectarDB
 
-from broker import Usuario, Accion_de_empresa, Transaccion, Porfolio
+db = ConectarDB()
+operaciones = OperacionesUsuarioDB()
 
 def mostrar_menu():
-    print("\nBienvenido al ARG Broker, ¿qué desea hacer?")
-    print("1. Ver datos de la cuenta")
-    print("2. Ver portafolio")
-    print("3. Comprar acciones")
-    print("4. Vender acciones")
-    print("5. Salir")
-
-def mostrar_acciones_disponibles():
-    acciones = {
-        '1': Accion_de_empresa('TechCorp', 1, 150.5, 1000),
-        '2': Accion_de_empresa('HealthInc', 1, 220.0, 1000),
-        '3': Accion_de_empresa('EcoEnergy', 1, 305.75, 1000),
-        '4': Accion_de_empresa('FinServ', 1, 100.0, 1000)
-    }
-    print("\n--- Acciones Disponibles ---")
-    for key, accion in acciones.items():
-        print(f"{key}. {accion.nombre_accion_empresa} - Cotización: ${accion.cotizacion}")
-    return acciones
-
-def seleccionar_accion(acciones):
-    opcion = input("Selecciona el número de la acción: ")
-    if opcion in acciones:
-        return acciones[opcion]
-    else:
-        print("Opción inválida. Intente nuevamente.")
-        return seleccionar_accion(acciones)
-
-def menu(usuario, porfolio):
     while True:
-        mostrar_menu()
-        opcion = input("Selecciona una opción: ")
+        if not operaciones.sesion.es_activa():
+            print("\nBienvenido al ARG Broker, ¿qué desea hacer?")
+            print("1. Mostrar Datos de Usuarios de Prueba")
+            print("2. Iniciar Sesión")
+            print("3. Recuperar Contraseña")
+            print("4. Salir")
 
-        if opcion == '1':
-            print("\n--- Datos de la Cuenta ---")
-            print(f"Saldo: {usuario.saldo}")
-            print(f"Total invertido: {usuario.total_invertido}")
-            print(f"Rendimiento total: {usuario.rendimiento_total}%")
-        
-        elif opcion == '2':
-            print("\n--- Portafolio ---")
-            historial = porfolio.historial()
-            print(f"Acciones compradas: {historial['compradas']}")
-            print(f"Acciones vendidas: {historial['vendidas']}")
-            print(f"Ganancias: {historial['ganancias']}")
+            opcion = input("Seleccione una opción: ")
 
-        elif opcion == '3':
-            print("\n--- Comprar Acciones ---")
-            acciones = mostrar_acciones_disponibles()
-            accion = seleccionar_accion(acciones)
-            cantidad = int(input(f"¿Cuántas acciones de {accion.nombre_accion_empresa} deseas comprar? "))
-            transaccion = Transaccion("2024-10-14", 10, 0)  # Comision del broker
-            try:
-                transaccion.compra(accion, cantidad, usuario)
-                porfolio.agregar_accion_comprada(accion, cantidad)
-                print(f"Compra realizada exitosamente: {cantidad} acciones de {accion.nombre_accion_empresa}")
-            except ValueError as e:
-                print(f"Error: {e}")
-
-        elif opcion == '4':
-            print("\n--- Vender Acciones ---")
-            acciones = mostrar_acciones_disponibles()
-            accion = seleccionar_accion(acciones)
-            cantidad = int(input(f"¿Cuántas acciones de {accion.nombre_accion_empresa} deseas vender? "))
-            transaccion = Transaccion("2024-10-14", 10, 0)  # Comision del broker
-            try:
-                transaccion.venta(accion, cantidad, usuario)
-                porfolio.agregar_accion_vendida(accion, cantidad)
-                print(f"Venta realizada exitosamente: {cantidad} acciones de {accion.nombre_accion_empresa}")
-            except ValueError as e:
-                print(f"Error: {e}")
-
-        elif opcion == '5':
-            print("Saliendo del menú...")
-            break
+            if opcion == "1":
+                operaciones.mostrar_usuarios()
+            elif opcion == "2":
+                print("\n--- Iniciar Sesión ---")
+                cuil_o_email = input("Ingrese su CUIL o email: ")
+                password = input("Ingrese su contraseña: ")
+                
+                operaciones.iniciar_sesion(cuil_o_email, password)
+            elif opcion == "3":
+                print("\n--- Recuperar Contraseña ---")
+                recuperar_password()
+            elif opcion == "4":
+                print("Saliendo del sistema...")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
 
         else:
-            print("Opción inválida.")
+            print("\nMenú Usuario")
+            print("1. Mostrar Transacciones")
+            print("2. Mostrar Portafolio")
+            print("3. Mostrar Acciones Disponibles")
+            print("4. Mostrar Cotizaciones de una Acción")
+            print("5. Cambiar Contraseña")
+            print("6. Cerrar Sesión")
+            print("7. Salir")
 
-# Ejemplo de uso:
+            opcion = input("Seleccione una opción: ")
+
+            if opcion == "1":
+                operaciones.mostrar_transacciones()
+            elif opcion == "2":
+                operaciones.mostrar_portafolio()
+            elif opcion == "3":
+                mostrar_acciones_disponibles()
+            elif opcion == "4":
+                mostrar_cotizaciones_accion()
+            elif opcion == "5":
+                cambiar_password()
+            elif opcion == "6":
+                operaciones.cerrar_sesion()
+            elif opcion == "7": 
+                # Este me queda en duda, se podría eliminar ya que obligaría a cerrar sesión 
+                # y mostraria nuevamente el menu principal donde si esta la opcion de salir
+                
+                # Lo iba a eliminar, pero lo dejo como opción, sin embargo me aseguro que primero se cierre la sesión antes de cerrar el programa
+                operaciones.cerrar_sesion()                
+                print("Saliendo del sistema...")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
+            
+
+def cambiar_password():
+    if operaciones.sesion.es_activa():
+        usuario_id = operaciones.sesion.usuario[0]  # Obtener el ID del usuario en sesión
+        password_actual = input("Ingrese su contraseña actual: ")
+        nueva_password = input("Ingrese su nueva contraseña: ")
+        
+        operaciones.cambiar_password_conectado(usuario_id, password_actual, nueva_password)
+    else:
+        print("Debe iniciar sesión para cambiar la contraseña.")
+        
+def recuperar_password():
+    cuil_o_email = input("Ingrese su cuil o email: ")
+    operaciones.solicitar_codigo_verificacion(cuil_o_email)
+    operaciones.recuperar_password(cuil_o_email)
+
+# Función para mostrar cotizaciones históricas de una acción
+def mostrar_cotizaciones_accion():
+    id_accion = input("Ingrese el ID de la acción: ")
+    db.conectar()
+    query = """
+    SELECT fechaHora, precio 
+    FROM Cotizacion 
+    WHERE idAccion = %s 
+    ORDER BY fechaHora DESC
+    """
+    print(f"\n--- Cotizaciones Históricas de la Acción {id_accion} ---")
+    cotizaciones = db.obtener_datos(query, (id_accion,))
+    for cotizacion in cotizaciones:
+        print(f"Fecha: {cotizacion[0]}, Precio: {cotizacion[1]}")
+    db.desconectar()
+
+# Función para mostrar todas las acciones disponibles
+def mostrar_acciones_disponibles():
+    db.conectar()
+    consulta = "SELECT nombre, simbolo, precio_actual, idAccion FROM Accion"
+    acciones = db.obtener_datos(consulta)
+    print("\n--- Acciones Disponibles ---")
+    for accion in acciones:
+        print(f"Nombre: {accion[0]}, Símbolo: {accion[1]}, Precio Actual: {accion[2]}, ID Acción: {accion[3]}")
+    db.desconectar()
+
 if __name__ == "__main__":
-    # Crear un usuario de ejemplo
-    usuario = Usuario("Juan", "juan@email.com", "123 Calle", 123456)
-    porfolio = Porfolio()
-
-    # Realizar un depósito inicial para tener saldo
-    usuario.deposito_inicial(1000)
-
-    # Ejecutar el menú
-    menu(usuario, porfolio)
+    mostrar_menu()
