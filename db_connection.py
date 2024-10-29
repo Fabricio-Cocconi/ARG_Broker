@@ -32,7 +32,7 @@ class ConectarDB:
             else:
                 cursor.execute(consulta)
             self.connection.commit()
-            print("Consulta ejecutada exitosamente")
+            # print("Consulta ejecutada exitosamente")
         except Error as e:
             print(f"Error al ejecutar la consulta: {e}")
         finally:

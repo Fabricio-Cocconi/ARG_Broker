@@ -1,3 +1,4 @@
+from sesion import Sesion
 from db_connection import ConectarDB        
 from datetime import datetime, timedelta
 import random
@@ -8,6 +9,7 @@ class OperacionesUsuarioDB:
         # Se uso self.db en lugar de una variable para que la conexión este activa mientras la instancia de clase este en uso
         self.db = ConectarDB()
         self.db.conectar()
+        self.sesion = Sesion()  # Instancia de la clase Sesion para gestionar la sesión actual
 
     def __del__(self):
         # Antes de eliminar la instancia de OperacionesDB se asegura de cerrar la conexión con la base de datos
@@ -62,6 +64,8 @@ class OperacionesUsuarioDB:
                 print("Inicio de sesión exitoso")
                 # Resetear intentos fallidos
                 self.db.ejecutar_consulta("UPDATE Usuario SET intentos_fallidos = 0 WHERE idUsuario = %s", (usuario[0],))
+                # Iniciar sesión usando la instancia de Sesion
+                self.sesion.iniciar(usuario)
                 return True
             else:
                 # Incrementar intentos fallidos
@@ -101,7 +105,7 @@ class OperacionesUsuarioDB:
         else:
             print("Usuario no encontrado.")
 
-    def cambiar_password_por_codigo(self, cuil_o_email):
+    def recuperar_password(self, cuil_o_email):
         # Este metodo es para que pueda cambiar la contraseña quien lo hace mediante la recuperación de contraseña
         consulta = "SELECT * FROM Usuario WHERE cuil = %s OR email = %s"
         valores = (cuil_o_email, cuil_o_email)
@@ -141,6 +145,12 @@ class OperacionesUsuarioDB:
         else:
             print("Usuario no encontrado.")
 
+    def cerrar_sesion(self):
+        if self.sesion.es_activa():
+            print(f"El usuario {self.sesion.usuario[1]} {self.sesion.usuario[2]} ha cerrado sesión.")
+            self.sesion.cerrar()
+        else:
+            print("No hay una sesión activa.")
 
 # Prueba conexión y muestra usuarios de la base
 if __name__ == "__main__":
