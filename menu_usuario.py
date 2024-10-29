@@ -1,14 +1,16 @@
 from operaciones_usuario import OperacionesUsuarioDB
+from db_connection import ConectarDB
 
+db = ConectarDB()
 operaciones = OperacionesUsuarioDB()
 
 def mostrar_menu():
     while True:
         if not operaciones.sesion.es_activa():
             print("\nBienvenido!")
-            print("1. Mostrar datos de usuarios de prueba")
-            print("2. Iniciar sesión")
-            print("3. Recuperar contraseña")
+            print("1. Mostrar Datos de Usuarios de Prueba")
+            print("2. Iniciar Sesión")
+            print("3. Recuperar Contraseña")
             print("4. Salir")
 
             opcion = input("Seleccione una opción: ")
@@ -21,10 +23,6 @@ def mostrar_menu():
                 password = input("Ingrese su contraseña: ")
                 
                 operaciones.iniciar_sesion(cuil_o_email, password)
-                # if operaciones.iniciar_sesion(cuil_o_email, password):
-                    # print("Sesión iniciada exitosamente.")
-                # else:
-                    # print("Error en el inicio de sesión. Intente nuevamente.")
             elif opcion == "3":
                 print("\n--- Recuperar Contraseña ---")
                 recuperar_password()
@@ -36,17 +34,31 @@ def mostrar_menu():
 
         else:
             print("\nMenú Usuario")
-            print("1. Cambiar contraseña")
-            print("2. Cerrar sesión")
-            print("3. Salir")
+            print("1. Mostrar Transacciones")
+            print("2. Mostrar Portafolio")
+            print("3. Mostrar Acciones Disponibles")
+            print("4. Mostrar Cotizaciones de una Acción")
+            print("5. Cambiar Contraseña")
+            print("6. Cerrar Sesión")
+            print("7. Salir")
 
             opcion = input("Seleccione una opción: ")
 
             if opcion == "1":
-                cambiar_password()
+                operaciones.mostrar_transacciones()
             elif opcion == "2":
-                operaciones.cerrar_sesion()
+                operaciones.mostrar_portafolio()
             elif opcion == "3":
+                mostrar_acciones_disponibles()
+            elif opcion == "4":
+                mostrar_cotizaciones_accion()
+            elif opcion == "5":
+                cambiar_password()
+            elif opcion == "6":
+                operaciones.cerrar_sesion()
+            elif opcion == "7": 
+                # Este me queda en duda, se podría eliminar ya que obligaría a cerrar sesión 
+                # y mostraria nuevamente el menu principal donde si esta la opcion de salir
                 print("Saliendo del sistema...")
                 break
             else:
@@ -68,7 +80,31 @@ def recuperar_password():
     operaciones.solicitar_codigo_verificacion(cuil_o_email)
     operaciones.recuperar_password(cuil_o_email)
 
-# Iniciar el menú
+# Función para mostrar cotizaciones históricas de una acción
+def mostrar_cotizaciones_accion():
+    id_accion = input("Ingrese el ID de la acción: ")
+    db.conectar()
+    query = """
+    SELECT fechaHora, precio 
+    FROM Cotizacion 
+    WHERE idAccion = %s 
+    ORDER BY fechaHora DESC
+    """
+    print(f"\n--- Cotizaciones Históricas de la Acción {id_accion} ---")
+    cotizaciones = db.obtener_datos(query, (id_accion,))
+    for cotizacion in cotizaciones:
+        print(f"Fecha: {cotizacion[0]}, Precio: {cotizacion[1]}")
+    db.desconectar()
+
+# Función para mostrar todas las acciones disponibles
+def mostrar_acciones_disponibles():
+    db.conectar()
+    consulta = "SELECT nombre, simbolo, precio_actual, idAccion FROM Accion"
+    acciones = db.obtener_datos(consulta)
+    print("\n--- Acciones Disponibles ---")
+    for accion in acciones:
+        print(f"Nombre: {accion[0]}, Símbolo: {accion[1]}, Precio Actual: {accion[2]}, ID Acción: {accion[3]}")
+    db.desconectar()
+
 if __name__ == "__main__":
-    # Iniciar el menú principal
     mostrar_menu()

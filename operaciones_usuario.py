@@ -151,6 +151,31 @@ class OperacionesUsuarioDB:
             self.sesion.cerrar()
         else:
             print("No hay una sesión activa.")
+            
+    
+    def mostrar_transacciones(self):
+        usuario = self.sesion.usuario[0]
+        consulta = "SELECT tipoTransaccion, cantidad, precio, fechaOperacion FROM Transaccion WHERE idUsuario = %s"
+        resultados = self.db.obtener_datos(consulta, (usuario,))
+        print(f"\n--- Transacciones del Usuario ---")
+        for fila in resultados:
+            print(fila)
+
+    def mostrar_portafolio(self):
+        query = """
+        SELECT u.nombre, a.nombre AS accion, p.cantidad 
+        FROM Usuario u
+        JOIN Portafolio p ON u.idUsuario = p.idUsuario
+        JOIN Accion a ON p.idAccion = a.idAccion
+        WHERE u.idUsuario = %s
+        """
+        print(f"\n--- Portafolio de {self.sesion.usuario[1]} {self.sesion.usuario[2]} ---")
+        portafolio = self.db.obtener_datos(query, (self.sesion.usuario[0], ))
+        for item in portafolio:
+            print(f"Acción: {item[1]}\t-\tCantidad: {item[2]}")
+
+
+
 
 # Prueba conexión y muestra usuarios de la base
 if __name__ == "__main__":
