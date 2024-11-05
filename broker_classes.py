@@ -1,6 +1,7 @@
 class Usuario:
-    def __init__(self, nombre, email, direccion, cuenta_bancaria):
+    def __init__(self, nombre, cuil, email, direccion, cuenta_bancaria):
         self.nombre = nombre
+        self.cuil = cuil
         self.email = email
         self.direccion = direccion
         self.__cuenta_bancaria = cuenta_bancaria

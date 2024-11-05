@@ -57,10 +57,10 @@ def mostrar_menu():
             elif opcion == "6":
                 operaciones.cerrar_sesion()
             elif opcion == "7": 
-                # Este me queda en duda, se podría eliminar ya que obligaría a cerrar sesión 
-                # y mostraria nuevamente el menu principal donde si esta la opcion de salir
+                # Esta opción me queda en duda, ya que se podría eliminar dejando solo la opción de cerrar sesión,
+                # obligando al usuario a primero cerrar sesión antes de cerrar el programa.
                 
-                # Lo iba a eliminar, pero lo dejo como opción, sin embargo me aseguro que primero se cierre la sesión antes de cerrar el programa
+                # Pero creo que lo mejor sería dejarlo, asegurandome primero que se cierre la sesión antes de cerrar el programa
                 operaciones.cerrar_sesion()                
                 print("Saliendo del sistema...")
                 break
@@ -102,11 +102,11 @@ def mostrar_cotizaciones_accion():
 # Función para mostrar todas las acciones disponibles
 def mostrar_acciones_disponibles():
     db.conectar()
-    consulta = "SELECT nombre, simbolo, precio_actual, idAccion FROM Accion"
+    consulta = "SELECT idAccion, nombre, simbolo, precio_actual FROM Accion"
     acciones = db.obtener_datos(consulta)
     print("\n--- Acciones Disponibles ---")
     for accion in acciones:
-        print(f"Nombre: {accion[0]}, Símbolo: {accion[1]}, Precio Actual: {accion[2]}, ID Acción: {accion[3]}")
+        print(f"ID Acción: {accion[0]}, Nombre: {accion[1]}, Símbolo: {accion[2]}, Precio Actual: {accion[3]}")
     db.desconectar()
 
 if __name__ == "__main__":
