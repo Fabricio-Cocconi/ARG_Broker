@@ -15,25 +15,26 @@ class OperacionesUsuarioDB:
         # Antes de eliminar la instancia de OperacionesDB se asegura de cerrar la conexión con la base de datos
         # y de paso sea "global" dentro de la clase y poder usarla en todos los metodos
         self.db.desconectar()
-
-    def mostrar_usuarios(self):
-        consulta_select = "SELECT * FROM Usuario"
-        resultados = self.db.obtener_datos(consulta_select)
-        print("Usuarios disponibles en la base de datos: ")
-        for fila in resultados:
-            print(fila)
             
-    def crear_usuario(self, nombre, apellido, cuil, email, password, saldo=0):
-        # Consulta de inserción
+    def crear_usuario(self, nombre, apellido, cuil, email, password):
+        if not all([nombre, apellido, cuil, email, password]):
+            print("Error: Todos los campos son obligatorios. Por favor, ingrese todos los datos.")
+            return
+    
         consulta = """
-        INSERT INTO Usuario (nombre, apellido, cuil, email, password, saldo) 
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO Usuario (nombre, apellido, cuil, email, password) 
+        VALUES (%s, %s, %s, %s, %s)
         """
-        valores = (nombre, apellido, cuil, email, password, saldo)
+        valores = (nombre, apellido, cuil, email, password)
         
-        # Ejecutar la consulta
-        self.db.ejecutar_consulta(consulta, valores)
-        print(f"Usuario {nombre} {apellido} creado exitosamente.")
+        # Compruebo si ya se encuentra en uso el CUIL o Email. En caso de ser afirmativo muestro un error.
+        if self.db.obtener_datos("SELECT * FROM Usuario WHERE cuil = %s OR email = %s", (cuil, email)):
+            print(f"Error: El cuil o email ingresado ya se encuentra en uso.")
+            return
+        else: 
+            # Ejecutar la consulta
+            self.db.ejecutar_consulta(consulta, valores)
+            print(f"Usuario {nombre} {apellido} creado exitosamente.")
 
     def iniciar_sesion(self, cuil_o_email, password):
         consulta = "SELECT * FROM Usuario WHERE cuil = %s OR email = %s"
@@ -48,7 +49,7 @@ class OperacionesUsuarioDB:
             # Verifica si el usuario está bloqueado temporalmente
             if hora_bloqueado is not None:
                 tiempo_actual = datetime.now()
-                tiempo_desbloqueo = hora_bloqueado + timedelta(minutes=15)  # Bloqueo de 15 minutos
+                tiempo_desbloqueo = hora_bloqueado + timedelta(minutes=1)  # Bloqueo de 15 minutos
                 
                 if tiempo_actual < tiempo_desbloqueo:
                     tiempo_restante = (tiempo_desbloqueo - tiempo_actual).seconds // 60
@@ -58,6 +59,7 @@ class OperacionesUsuarioDB:
                     # Si el tiempo de bloqueo ha pasado, resetear intentos
                     self.db.ejecutar_consulta("UPDATE Usuario SET intentos_fallidos = 0, hora_bloqueado = NULL WHERE idUsuario = %s", (usuario[0],))
                     print("Cuenta desbloqueada. Puedes intentar iniciar sesión nuevamente.")
+                    intentos = 0
 
             # Verifica la contraseña
             if usuario[5] == password: 
@@ -154,29 +156,6 @@ class OperacionesUsuarioDB:
         else:
             print("No hay una sesión activa.")
             
-    
-    def mostrar_transacciones(self):
-        usuario = self.sesion.usuario[0]
-        consulta = "SELECT tipoTransaccion, cantidad, precio, fechaOperacion FROM Transaccion WHERE idUsuario = %s"
-        resultados = self.db.obtener_datos(consulta, (usuario,))
-        print(f"\n--- Transacciones del Usuario ---")
-        for fila in resultados:
-            print(fila)
-
-    def mostrar_portafolio(self):
-        query = """
-        SELECT u.nombre, a.nombre AS accion, p.cantidad 
-        FROM Usuario u
-        JOIN Portafolio p ON u.idUsuario = p.idUsuario
-        JOIN Accion a ON p.idAccion = a.idAccion
-        WHERE u.idUsuario = %s
-        """
-        print(f"\n--- Portafolio de {self.sesion.usuario[1]} {self.sesion.usuario[2]} ---")
-        portafolio = self.db.obtener_datos(query, (self.sesion.usuario[0], ))
-        for item in portafolio:
-            print(f"Acción: {item[1]}\t-\tCantidad: {item[2]}")
-
-
 
 
 # Prueba conexión y muestra usuarios de la base

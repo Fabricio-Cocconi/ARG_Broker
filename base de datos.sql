@@ -16,7 +16,7 @@ CREATE TABLE Usuario (
     saldo DECIMAL(10, 2) DEFAULT 0,
     intentos_fallidos INT DEFAULT 0,
     hora_bloqueado DATETIME DEFAULT NULL,
-    codigo_verificacion VARCHAR(10) DEFAULT NULL;
+    codigo_verificacion VARCHAR(10) DEFAULT NULL
 );
 
 -- Tabla Accion
